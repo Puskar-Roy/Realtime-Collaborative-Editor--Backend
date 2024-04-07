@@ -28,10 +28,12 @@ export const createProfilePic = asyncHandler(
       if (!existingProfile) {
         throw new Error('User did not exist!');
       }
-      const createProfile = await UserModel.updateOne({
+      await UserModel.updateOne({
         profilePic: uploadCloud.secure_url,
       });
-      res.status(200).json(createProfile);
+      res
+        .status(200)
+        .json({ success: true, message: 'Profile Picture Uploded!' });
     } catch (error) {
       console.error('Error updating profile pic in database:', error);
       res.status(500).json({ error: 'Internal server error' });
