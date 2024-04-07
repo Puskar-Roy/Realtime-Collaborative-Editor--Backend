@@ -23,6 +23,10 @@ const userSchema = new Schema<User>(
     verificationTokens: [
       { type: Schema.Types.ObjectId, ref: 'VerificationToken' },
     ],
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

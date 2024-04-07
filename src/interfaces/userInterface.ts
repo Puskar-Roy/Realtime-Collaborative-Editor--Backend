@@ -6,4 +6,5 @@ export interface User extends Document {
   password: string;
   profilePic: string;
   verificationTokens: VerificationToken[];
+  isVerified: boolean;
 }

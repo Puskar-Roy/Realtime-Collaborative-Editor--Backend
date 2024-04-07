@@ -40,8 +40,8 @@ app.use(limiter);
 
 import './database/connectDb';
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/v0.1/auth', authRoutes);
+app.use('/api/v0.1/users', userRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ success: true, message: 'API IS WORKING 🥳' });

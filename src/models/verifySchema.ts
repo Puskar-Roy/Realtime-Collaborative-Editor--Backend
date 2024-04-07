@@ -2,7 +2,6 @@ import { Schema, model } from 'mongoose';
 import { VerificationToken } from '../interfaces/verifyInterface';
 
 const verificationTokenSchema = new Schema<VerificationToken>({
-  _id: String,
   token: { type: String, unique: true },
   userId: String,
   user: { type: Schema.Types.ObjectId, ref: 'EditorUser' },
