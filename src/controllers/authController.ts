@@ -20,10 +20,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     }
     if (user.isVerified === false) {
       await sendEmailwithNodemailer(user._id);
-      return res.status(200).json({
+      return res.status(400).json({
         message:
           'Email is not Verified, Verification email sent to your email!',
-        success: true,
+        success: false,
       });
     }
     const match = await bcrypt.compare(password, user.password);
