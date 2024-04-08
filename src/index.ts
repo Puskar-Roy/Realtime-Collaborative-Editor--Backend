@@ -10,6 +10,8 @@ import CheckError from './util/checkError';
 import errorHandler from './middleware/errorMiddleware';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import { Server } from 'socket.io';
+import http from 'http';
 
 const app: Express = express();
 
@@ -37,6 +39,13 @@ const limiter = rateLimit({
   max: 100,
 });
 app.use(limiter);
+app.use((req, res, next) => {
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
+const server = http.createServer(app);
+const io = new Server(server);
 
 import './database/connectDb';
 
@@ -52,7 +61,12 @@ app.all('*', (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(errorHandler);
-app.listen(process.env.PORT, () => {
+
+// app.listen(process.env.PORT, () => {
+//   console.log(`[⚡] Server Is Running on http://localhost:${config.PORT}`);
+// });
+
+server.listen(config.PORT, () => {
   console.log(`[⚡] Server Is Running on http://localhost:${config.PORT}`);
 });
 
