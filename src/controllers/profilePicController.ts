@@ -31,9 +31,11 @@ export const createProfilePic = asyncHandler(
       await UserModel.updateOne({
         profilePic: uploadCloud.secure_url,
       });
-      res
-        .status(200)
-        .json({ success: true, message: 'Profile Picture Uploded!' });
+      res.status(200).json({
+        success: true,
+        message: 'Profile Picture Uploded!',
+        pic: uploadCloud.secure_url,
+      });
     } catch (error) {
       console.error('Error updating profile pic in database:', error);
       res.status(500).json({ error: 'Internal server error' });

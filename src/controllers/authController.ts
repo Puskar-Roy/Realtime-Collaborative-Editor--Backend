@@ -37,6 +37,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       token: token,
       email: user.email,
       id: user._id,
+      name: user.name,
+      pic: user.profilePic,
     });
   } catch (error) {
     console.error('Login error:', error.message);
@@ -141,8 +143,10 @@ export const verifyResetToken = asyncHandler(
         userId: user._id,
       });
 
-      if (resetToken.expiresAt < new Date())
-        return res.status(400).send('Token has expired');
+      if (resetToken.expiresAt < new Date()) {
+        await VerifyModel.deleteOne({ _id: resetToken._id });
+        throw Error('Token has expired');
+      }
 
       if (!resetToken) {
         throw Error('Invalid or expired token');

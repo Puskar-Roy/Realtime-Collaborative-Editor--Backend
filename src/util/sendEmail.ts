@@ -17,9 +17,12 @@ export const sendEmailwithNodemailer = async (userId: string) => {
     const exists = await UserModel.findById({ _id: userId });
     console.log(exists);
     const token = uuidv4();
+    const tokenExpiresAt = new Date();
+    tokenExpiresAt.setMinutes(tokenExpiresAt.getMinutes() + 10);
     const tokenn = await VerifyModel.create({
       token: token,
       userId: exists._id,
+      expiresAt: tokenExpiresAt,
     });
     console.log(tokenn);
     const verificationLink = `${config.BACKENDURL}/api/v0.1/auth/verify-email/${exists._id}/?token=${token}`;
