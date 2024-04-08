@@ -150,8 +150,7 @@ export const verifyResetToken = asyncHandler(
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(newPassword, salt);
 
-      await UserModel.updateOne({ _id: user.id }, { $set: { password: hash } });
-
+      await UserModel.findByIdAndUpdate({ _id: user.id }, { password: hash });
       await VerifyModel.deleteOne({ id: resetToken.id });
 
       return res
