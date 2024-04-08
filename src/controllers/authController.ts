@@ -86,10 +86,15 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
     if (!user) {
       throw Error('User Not Found!');
     }
-    const verificationToken = await VerifyModel.findOne({ token });
+    const verificationToken = await VerifyModel.findOne({
+      token: token,
+      userId: user._id,
+    });
     if (!verificationToken) return res.status(404).send('Invalid token');
-    if (verificationToken.expiresAt < new Date())
-      return res.status(400).send('Token has expired');
+    if (verificationToken.expiresAt < new Date()) {
+      await VerifyModel.deleteOne({ _id: verificationToken._id });
+      throw Error('Token has expired');
+    }
     await UserModel.updateOne(
       { _id: verificationToken.userId },
       { $set: { isVerified: true } }

@@ -15,7 +15,6 @@ export const sendEmailwithNodemailer = async (userId: string) => {
 
   try {
     const exists = await UserModel.findById({ _id: userId });
-    console.log(exists);
     const token = uuidv4();
     const tokenExpiresAt = new Date();
     tokenExpiresAt.setMinutes(tokenExpiresAt.getMinutes() + 10);

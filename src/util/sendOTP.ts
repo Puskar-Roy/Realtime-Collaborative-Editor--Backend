@@ -17,7 +17,13 @@ export const sendOTPwithNodemailer = async (userId: string) => {
     const user = await UserModel.findById({ _id: userId });
     if (!user) throw new Error('User not found');
     const token = generateOTP();
-    await VerifyModel.create({ token: token, userId: user._id });
+    const tokenExpiresAt = new Date();
+    tokenExpiresAt.setMinutes(tokenExpiresAt.getMinutes() + 10);
+    await VerifyModel.create({
+      token: token,
+      userId: user._id,
+      expiresAt: tokenExpiresAt,
+    });
     const mailOptions = {
       from: 'puskarroy300@gmail.com',
       to: user.email,
