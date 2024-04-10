@@ -45,7 +45,11 @@ app.use((req, res, next) => {
 });
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: config.FRONTENDURL,
+  },
+});
 
 import './database/connectDb';
 
@@ -62,9 +66,42 @@ app.all('*', (req: Request, res: Response, next: NextFunction) => {
 
 app.use(errorHandler);
 
-// app.listen(process.env.PORT, () => {
-//   console.log(`[⚡] Server Is Running on http://localhost:${config.PORT}`);
-// });
+const userSocketMap = {};
+const userPicMap = {};
+const getAllClients = (roomId) => {
+  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
+    (socketId) => {
+      return {
+        socketId,
+        name: userSocketMap[socketId],
+        pic: userPicMap[socketId],
+      };
+    }
+  );
+};
+let activeConnections = 0;
+io.on('connection', (socket) => {
+  activeConnections++;
+  console.log(
+    `User Connected - ${socket.id}, Total Connections: ${activeConnections}`
+  );
+  socket.on('join', ({ name, roomId, pic }) => {
+    console.log(name, pic, roomId);
+    userSocketMap[socket.id] = name;
+    userPicMap[socket.id] = pic;
+    socket.join(roomId);
+    const clients = getAllClients(roomId);
+    clients.forEach((dataa) => {
+      io.to(dataa.socketId).emit('joined', {
+        clients,
+        name: dataa.name,
+        pic: dataa.pic,
+        socketId: socket.id,
+      });
+    });
+    console.log(clients);
+  });
+});
 
 server.listen(config.PORT, () => {
   console.log(`[⚡] Server Is Running on http://localhost:${config.PORT}`);

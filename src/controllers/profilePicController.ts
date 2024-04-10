@@ -28,9 +28,12 @@ export const createProfilePic = asyncHandler(
       if (!existingProfile) {
         throw new Error('User did not exist!');
       }
-      await UserModel.updateOne({
-        profilePic: uploadCloud.secure_url,
-      });
+      await UserModel.findByIdAndUpdate(
+        { _id: existingProfile._id },
+        {
+          profilePic: uploadCloud.secure_url,
+        }
+      );
       res.status(200).json({
         success: true,
         message: 'Profile Picture Uploded!',

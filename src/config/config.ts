@@ -10,6 +10,7 @@ const config = {
   EMAIL: process.env.EMAIL,
   PASSWORD: process.env.PASSWORD,
   BACKENDURL: process.env.BACKENDURL,
+  FRONTENDURL: process.env.FRONTENDURL,
 };
 
 export default config;
