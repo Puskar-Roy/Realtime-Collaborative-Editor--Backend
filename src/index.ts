@@ -100,13 +100,32 @@ io.on('connection', (socket) => {
         pic: dataa.pic,
         socketId: socket.id,
       });
+      if (dataa.socketId !== socket.id) {
+        io.to(dataa.socketId).emit('userEntered', {
+          name,
+          pic,
+          clients,
+          socketId: socket.id,
+        });
+      }
     });
-    console.log(clients);
+  });
+
+  socket.on('disconnecting', () => {
+    const rooms = [...socket.rooms];
+    rooms.forEach((roomId) => {
+      socket.leave(roomId);
+      socket.in(roomId).emit('disconnected', {
+        socketId: socket.id,
+        name: userSocketMap[socket.id],
+      });
+    });
+    delete userSocketMap[socket.id];
   });
 });
 
 server.listen(config.PORT, () => {
-  console.log(`[⚡] Server Is Running on http://localhost:${config.PORT}`);
+  console.log(`[⚡] Server Is Running on ${config.BACKENDURL}`);
 });
 
 export default app;
