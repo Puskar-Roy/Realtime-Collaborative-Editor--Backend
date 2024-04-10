@@ -48,6 +48,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: 'https://realtime-texteditor.vercel.app',
+    credentials: true,
+    methods: ['GET', 'POST'],
   },
 });
 
