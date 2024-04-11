@@ -70,6 +70,7 @@ app.use(errorHandler);
 
 const userSocketMap = {};
 const userPicMap = {};
+
 const getAllClients = (roomId) => {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
     (socketId) => {
@@ -93,21 +94,12 @@ io.on('connection', (socket) => {
     userPicMap[socket.id] = pic;
     socket.join(roomId);
     const clients = getAllClients(roomId);
-    clients.forEach((dataa) => {
-      io.to(dataa.socketId).emit('joined', {
+    clients.forEach(({ socketId }) => {
+      io.to(socketId).emit('joined', {
         clients,
-        name: dataa.name,
-        pic: dataa.pic,
+        name,
         socketId: socket.id,
       });
-      if (dataa.socketId !== socket.id) {
-        io.to(dataa.socketId).emit('userEntered', {
-          name,
-          pic,
-          clients,
-          socketId: socket.id,
-        });
-      }
     });
   });
 
