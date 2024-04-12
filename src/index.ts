@@ -103,16 +103,40 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('code-change', ({ roomId, code }) => {
+    console.log('code - ' + code);
+    socket.in(roomId).emit('code-change', { code });
+  });
+  // socket.on('sync-code', ({ socketId, code }) => {
+  //   io.to(socketId).emit('sync-code', { code });
+  // });
+
+  // socket.on('disconnecting', () => {
+  //   const rooms = [...socket.rooms];
+  //   rooms.forEach((roomId) => {
+  //     socket.leave(roomId);
+  //     socket.in(roomId).emit('disconnected', {
+  //       socketId: socket.id,
+  //       name: userSocketMap[socket.id],
+  //     });
+  //   });
+  //   delete userSocketMap[socket.id];
+  // });
+
   socket.on('disconnecting', () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {
       socket.leave(roomId);
-      socket.in(roomId).emit('disconnected', {
-        socketId: socket.id,
-        name: userSocketMap[socket.id],
+      delete userSocketMap[socket.id];
+      delete userPicMap[socket.id];
+      const clients = getAllClients(roomId);
+      clients.forEach(({ socketId }) => {
+        io.to(socketId).emit('disconnected', {
+          socketId: socket.id,
+          name: userSocketMap[socket.id],
+        });
       });
     });
-    delete userSocketMap[socket.id];
   });
 });
 
