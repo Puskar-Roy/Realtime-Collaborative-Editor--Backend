@@ -12,6 +12,8 @@
     "format": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/preset-env": "^7.24.4",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.1.0",
     "colorette": "^2.0.20",

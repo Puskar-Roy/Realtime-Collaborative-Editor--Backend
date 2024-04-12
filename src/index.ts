@@ -82,14 +82,9 @@ const getAllClients = (roomId) => {
     }
   );
 };
-let activeConnections = 0;
+
 io.on('connection', (socket) => {
-  activeConnections++;
-  console.log(
-    `User Connected - ${socket.id}, Total Connections: ${activeConnections}`
-  );
   socket.on('join', ({ name, roomId, pic }) => {
-    console.log(name, pic, roomId);
     userSocketMap[socket.id] = name;
     userPicMap[socket.id] = pic;
     socket.join(roomId);
@@ -104,11 +99,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('code-change', ({ roomId, code }) => {
-    console.log('code - ' + code);
     socket.in(roomId).emit('code-change', { code });
   });
+
   // socket.on('sync-code', ({ socketId, code }) => {
-  //   io.to(socketId).emit('sync-code', { code });
+  //   console.log(code);
+  //   io.to(socketId).emit('code-change', { code });
   // });
 
   // socket.on('disconnecting', () => {
