@@ -16,7 +16,7 @@ import http from 'http';
 const app: Express = express();
 
 // whitelist contains the allowed origins for CORS requests.
-const whitelist = ['https://<your-production-api-link>']; // It is used to check if a request's origin is allowed to access the server.
+const whitelist = ['http://localhost:5173']; // It is used to check if a request's origin is allowed to access the server.
 
 const corsOptions: CorsOptions = {
   origin: function (origin, callback) {
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://realtime-texteditor.vercel.app',
+    origin: `${config.FRONTENDURL}`,
     credentials: true,
     methods: ['GET', 'POST'],
   },
@@ -67,9 +67,10 @@ app.all('*', (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(errorHandler);
-
 const userSocketMap = {};
 const userPicMap = {};
+const roomCodeMap = {};
+const typingUsers = {};
 
 const getAllClients = (roomId) => {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
@@ -82,6 +83,14 @@ const getAllClients = (roomId) => {
     }
   );
 };
+
+function getCodeForRoom(roomId) {
+  return roomCodeMap[roomId] || '';
+}
+
+function setCodeForRoom(roomId, code) {
+  roomCodeMap[roomId] = code;
+}
 
 io.on('connection', (socket) => {
   socket.on('join', ({ name, roomId, pic }) => {
@@ -96,28 +105,32 @@ io.on('connection', (socket) => {
         socketId: socket.id,
       });
     });
+
+    // Send existing code to the newly joined user
+    const code = getCodeForRoom(roomId);
+    if (code) {
+      socket.emit('existing-code', { code });
+    }
   });
 
   socket.on('code-change', ({ roomId, code }) => {
+    setCodeForRoom(roomId, code);
     socket.in(roomId).emit('code-change', { code });
   });
 
-  // socket.on('sync-code', ({ socketId, code }) => {
-  //   console.log(code);
-  //   io.to(socketId).emit('code-change', { code });
-  // });
+  socket.on('typing-start', ({ roomId, userId }) => {
+    typingUsers[roomId] = typingUsers[roomId] || {};
+    typingUsers[roomId][userId] = true;
+    console.log(typingUsers);
+    io.to(roomId).emit('typing-start', { userId });
+  });
 
-  // socket.on('disconnecting', () => {
-  //   const rooms = [...socket.rooms];
-  //   rooms.forEach((roomId) => {
-  //     socket.leave(roomId);
-  //     socket.in(roomId).emit('disconnected', {
-  //       socketId: socket.id,
-  //       name: userSocketMap[socket.id],
-  //     });
-  //   });
-  //   delete userSocketMap[socket.id];
-  // });
+  socket.on('typing-stop', ({ roomId, userId }) => {
+    if (typingUsers[roomId]) {
+      typingUsers[roomId][userId] = false;
+      io.to(roomId).emit('typing-stop', { userId });
+    }
+  });
 
   socket.on('disconnecting', () => {
     const rooms = [...socket.rooms];
