@@ -105,8 +105,6 @@ io.on('connection', (socket) => {
         socketId: socket.id,
       });
     });
-
-    // Send existing code to the newly joined user
     const code = getCodeForRoom(roomId);
     if (code) {
       socket.emit('existing-code', { code });
