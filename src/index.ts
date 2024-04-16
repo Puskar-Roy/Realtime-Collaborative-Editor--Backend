@@ -121,7 +121,6 @@ io.on('connection', (socket) => {
   socket.on('typing-start', ({ roomId, userId }) => {
     typingUsers[roomId] = typingUsers[roomId] || {};
     typingUsers[roomId][userId] = true;
-    console.log(typingUsers);
     io.to(roomId).emit('typing-start', { userId });
   });
 
@@ -148,7 +147,6 @@ io.on('connection', (socket) => {
     });
   });
 });
-
 server.listen(config.PORT, () => {
   console.log(`[⚡] Server Is Running on ${config.BACKENDURL}`);
 });
