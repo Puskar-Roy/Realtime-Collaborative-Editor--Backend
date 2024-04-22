@@ -12,6 +12,8 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import { Server } from 'socket.io';
 import http from 'http';
+import cookieSession from 'cookie-session';
+import passport from 'passport';
 
 const app: Express = express();
 
@@ -34,6 +36,10 @@ app.use(helmet());
 app.use(xss());
 app.use(hpp());
 app.use(mongoSanitize());
+app.use(cookieSession())
+app.use(passport.initialize());
+app.use(passport.session());
+
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 100,
