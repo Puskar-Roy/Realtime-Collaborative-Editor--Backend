@@ -97,3 +97,5 @@ passport.deserializeUser((user, callback) => {
 function uuidv4() {
   throw new Error('Function not implemented.');
 }
+
+export default passport;
