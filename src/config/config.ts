@@ -11,6 +11,10 @@ const config = {
   PASSWORD: process.env.PASSWORD,
   BACKENDURL: process.env.BACKENDURL,
   FRONTENDURL: process.env.FRONTENDURL,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_URL: process.env.GOOGLE_URL,
+  CLIENT_URL: process.env.CLIENT_URL,
 };
 
 export default config;
