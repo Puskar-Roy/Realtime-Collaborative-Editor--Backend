@@ -1,11 +1,13 @@
 ### Backend
+
 ```bash
  https://github.com/Puskar-Roy/Realtime-Collaborative-Editor--Backend
 ```
+
 ### Add Env
 
 ```bash
-PORT=8080 
+PORT=8080
 MONGOURI=
 
 JWT_SECRET="itsyourjwtsecrentusesomethingbigtoprotectyourjwtauthentication"
@@ -19,4 +21,8 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_URL= "http://localhost:8080/auth/google/callback"
+CLIENT_URL="http://localhost:8080"
 ```
