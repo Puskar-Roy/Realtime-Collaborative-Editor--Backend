@@ -1,6 +1,8 @@
 import express, { Router } from 'express';
 import passport from 'passport';
 
+import passportSetup from '../util/auth/oauth';
+
 import config from '../config/config';
 import {
   login,

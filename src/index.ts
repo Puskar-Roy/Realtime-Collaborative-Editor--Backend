@@ -15,7 +15,6 @@ import http from 'http';
 import cookieSession from 'cookie-session';
 import passport from 'passport';
 
-import passportSetup from './util/auth/oauth';
 const app: Express = express();
 
 // whitelist contains the allowed origins for CORS requests.
