@@ -1,7 +1,5 @@
 import express, { Router } from 'express';
-import passport from 'passport';
-
-import passportSetup from '../util/auth/oauth';
+import passport from '../util/auth/oauth';
 
 import config from '../config/config';
 import {
@@ -28,7 +26,10 @@ router.get(
 );
 
 router.get(
-  '/google',
+  '/google',(req, res, next)=>{
+    console.log('google auth hit');
+    next();
+  },
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
