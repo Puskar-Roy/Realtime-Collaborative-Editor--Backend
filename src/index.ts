@@ -36,7 +36,13 @@ app.use(helmet());
 app.use(xss());
 app.use(hpp());
 app.use(mongoSanitize());
-app.use(cookieSession())
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: ['Atul_got_cookies'],
+    maxAge: 24 * 60 * 60 * 100,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
