@@ -1,8 +1,24 @@
 import express from 'express';
+import express_session from 'express-session';
+
 import passport from '../util/auth/oauth';
 import config from '../config/config';
 
 const router = express.Router();
+
+router.use(
+  express_session({
+    secret: config.SESSION_SECRET || 'BALMER234ui',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: config.DEV_ENV === 'PROD'? true : false,
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+  })
+)
 
 router.get(
   '/google/callback',
