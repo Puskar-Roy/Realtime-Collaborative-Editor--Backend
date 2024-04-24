@@ -7,9 +7,15 @@ import UserModel from '../../models/userSchema';
 import { User } from '../../interfaces/userInterface';
 import VerifyModel from '../../models/verifySchema';
 
+
 var isInvalid = false;
 
-async function createToken(user: User) {
+interface iAuthUser extends User{
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+async function createToken(user: iAuthUser) {
   try {
     const token = uuidv4();
     const tokenExpiresAt = new Date();
@@ -29,7 +35,7 @@ async function createToken(user: User) {
   }
 }
 
-const addToken = async (token: unknown, user: User) => {
+const addToken = async (token: unknown, user: iAuthUser) => {
   try {
     if (!token || typeof token !== 'string') throw new Error('Invalid token');
 
@@ -62,25 +68,27 @@ passport.use(
       scope: ['profile', 'email'],
     },
     async (accessToken, refreshToken, profile, callback) => {
-      console.log('\n Google OAuth details', profile);
+      console.log('\n \n In the GoogleStrategy callback function \n \n');
+      console.log("Tokens are: \n");
+      console.log('accessToken', accessToken, "\n refreshToken", refreshToken);
       try {
-        // check if the user already user
-        let user = await UserModel.findOne({ email: profile.emails[0].value });
+        let user: iAuthUser = await UserModel.findOne({ email: profile.emails[0].value });
         if (user) {
-          return callback(null, user);
+          return callback(null, {...user, accessToken, refreshToken });
         }
 
         user = await UserModel.create({
           name: profile.displayName,
           email: profile.emails[0].value,
-          password: profile.id, // This will act as a strong password
+          password: profile.id,
           profilePic: profile.photos[0].value,
-        });
+        }) ;
 
-        // create a token and send to the user
         await createToken(user);
+
+        console.log('user', user);
         if (isInvalid) return callback(null, null);
-        return callback(null, user, { accessToken, refreshToken });
+        return callback(null, {...user, accessToken, refreshToken });
       } catch (error) {
         callback(error, null);
       }
