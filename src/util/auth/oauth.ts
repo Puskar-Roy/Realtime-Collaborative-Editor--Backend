@@ -62,7 +62,7 @@ passport.use(
       scope: ['profile', 'email'],
     },
     async (accessToken, refreshToken, profile, callback) => {
-      console.log("\n Google OAuth details",profile);
+      console.log('\n Google OAuth details', profile);
       try {
         // check if the user already user
         let user = await UserModel.findOne({ email: profile.emails[0].value });
@@ -73,14 +73,14 @@ passport.use(
         user = await UserModel.create({
           name: profile.displayName,
           email: profile.emails[0].value,
-          password: profile.googleId, // This will act as a strong password
+          password: profile.id, // This will act as a strong password
           profilePic: profile.photos[0].value,
-        });      
+        });
 
         // create a token and send to the user
         await createToken(user);
         if (isInvalid) return callback(null, null);
-        return callback(null, user);
+        return callback(null, user, { accessToken, refreshToken });
       } catch (error) {
         callback(error, null);
       }
@@ -95,8 +95,5 @@ passport.serializeUser((user, callback) => {
 passport.deserializeUser((user, callback) => {
   callback(null, user);
 });
-function uuidv4() {
-  throw new Error('Function not implemented.');
-}
 
 export default passport;
