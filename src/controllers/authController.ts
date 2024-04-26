@@ -51,14 +51,16 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    throw Error('All fields must be filled');
-  }
-  if (!validator.isEmail(email)) {
-    throw Error('Email is not valid');
-  }
   try {
+    const { name, email, password } = req.body;
+    console.log('fields are:', name, email, password);
+    if (!name || !email || !password) {
+      throw Error('All fields must be filled');
+    }
+    if (!validator.isEmail(email)) {
+      throw Error('Email is not valid');
+    }
+
     const exists = await UserModel.findOne({ email });
     if (exists) {
       throw Error('Email already in use');
