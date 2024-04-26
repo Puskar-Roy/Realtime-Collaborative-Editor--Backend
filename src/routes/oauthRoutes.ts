@@ -3,7 +3,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import passport from '../util/auth/oauth';
 import config from '../config/config';
 import { setGauthInCookie } from '../controllers/authController';
-import asyncHandler from '../util/catchAsync';
 
 import { iRequestWithToken } from '../interfaces/oauthInterfaces';
 
@@ -20,7 +19,7 @@ router.get(
 );
 
 // This is a temporary callback middleware for debug purpose for the /google/callback route
-const temp_callback_middleware = (req: iRequestWithToken, res) => {
+const temp_callback_middleware = (req: iRequestWithToken, res: Response) => {
   try {
     console.log('google auth callback hit');
     console.log('req.user: ', req.user);
@@ -43,7 +42,7 @@ const temp_callback_middleware = (req: iRequestWithToken, res) => {
 
 router.get(
   '/google',
-  (req:Request, res, next) => {
+  (req: Request, res: Response, next: NextFunction) => {
     console.log('google auth hit');
     console.log('original url: ', req.originalUrl);
     next();
@@ -51,7 +50,7 @@ router.get(
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-router.get('/logout', (req, res) => {
+router.get('/logout', (req: Request, res: Response) => {
   // @ts-ignore
   req.logout();
   res.redirect(config.CLIENT_URL);
