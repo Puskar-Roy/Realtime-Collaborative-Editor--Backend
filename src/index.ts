@@ -5,13 +5,19 @@ import hpp from 'hpp';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import cors, { CorsOptions } from 'cors';
+import express_session from 'express-session';
+
 import config from './config/config';
 import CheckError from './util/checkError';
 import errorHandler from './middleware/errorMiddleware';
+import oauthRoutes from './routes/oauthRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+
 import { Server } from 'socket.io';
 import http from 'http';
+// import cookieSession from 'cookie-session';
+import passport from 'passport';
 
 const app: Express = express();
 
@@ -34,6 +40,22 @@ app.use(helmet());
 app.use(xss());
 app.use(hpp());
 app.use(mongoSanitize());
+app.use(
+  express_session({
+    secret: config.SESSION_SECRET || 'BALMER234ui',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: config.DEV_ENV === 'PROD' ? true : false,
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 100,
@@ -54,10 +76,24 @@ const io = new Server(server, {
 });
 
 import './database/connectDb';
+import { resolve } from 'path';
 
+app.get('/success_auth',
+  (req, res, next) => {
+    res.json({message: 'You are verified', redirectURL: config.CLIENT_URL}); // send response
+  },
+);
+
+app.get('/failure_auth', 
+  (req, res) => {
+    res.json({success: false, message: 'You are not verified', redirectURL: config.CLIENT_URL}); // send response
+  },
+);
+
+
+app.use('/auth', oauthRoutes);
 app.use('/api/v0.1/auth', authRoutes);
 app.use('/api/v0.1/users', userRoutes);
-
 app.get('/', (req: Request, res: Response) => {
   res.json({ success: true, message: 'API IS WORKING 🥳' });
 });

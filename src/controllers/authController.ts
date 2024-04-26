@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import asyncHandler from '../util/catchAsync';
 import UserModel from '../models/userSchema';
 import VerifyModel from '../models/verifySchema';
@@ -7,6 +7,7 @@ import validator from 'validator';
 import { createToken } from '../util/utils';
 import { sendEmailwithNodemailer } from '../util/sendEmail';
 import { sendOTPwithNodemailer } from '../util/sendOTP';
+import config from '../config/config';
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -50,14 +51,16 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    throw Error('All fields must be filled');
-  }
-  if (!validator.isEmail(email)) {
-    throw Error('Email is not valid');
-  }
   try {
+    const { name, email, password } = req.body;
+    console.log('fields are:', name, email, password);
+    if (!name || !email || !password) {
+      throw Error('All fields must be filled');
+    }
+    if (!validator.isEmail(email)) {
+      throw Error('Email is not valid');
+    }
+
     const exists = await UserModel.findOne({ email });
     if (exists) {
       throw Error('Email already in use');
@@ -170,6 +173,44 @@ export const verifyResetToken = asyncHandler(
       return res
         .status(400)
         .json({ success: false, message: 'Password reset failed' });
+    }
+  }
+);
+
+import { iOAuthRequest } from '../interfaces/oauthInterfaces';
+
+export const setGauthInCookie = asyncHandler(
+  async (req: iOAuthRequest, res: Response) => {
+    const user = req.user._doc;
+    try {
+      if (!user) {
+        throw Error('User not found');
+      }
+      const token = createToken(user._id);
+      const cookieOptions: CookieOptions = {
+        httpOnly: false,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 30),
+        secure: config.DEV_ENV === 'PROD' ? true : false,
+        sameSite: 'lax',
+      };
+      const cookieInfo = {
+        message: 'Login successful!',
+        success: true,
+        token: token,
+        email: user.email,
+        id: user._id.toString(),
+        name: user.name,
+        pic: user.profilePic,
+      };
+
+      res.cookie('oauthToken', JSON.stringify(cookieInfo), cookieOptions);
+      res.redirect(config.FRONTENDURL);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        message: 'Login failed!',
+        success: false,
+      });
     }
   }
 );
