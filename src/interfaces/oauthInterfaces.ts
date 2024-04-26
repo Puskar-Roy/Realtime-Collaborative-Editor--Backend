@@ -5,3 +5,17 @@ export interface iRequestWithToken extends Request {
     refreshToken: string;
   };
 }
+
+export interface iOAuthRequest extends Request {
+  user: {
+    _doc: {
+      _id: string;
+      email: string;
+      name: string;
+      profilePic: string;
+    };
+    email: string;
+    name: string;
+    profilePic: string;
+  };
+}

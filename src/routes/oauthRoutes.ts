@@ -1,8 +1,8 @@
-import express,{NextFunction, Request, Response} from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 import passport from '../util/auth/oauth';
 import config from '../config/config';
-import {  sendOAuthVerifiedUser, setGauthInCookie } from '../controllers/authController';
+import { setGauthInCookie } from '../controllers/authController';
 import asyncHandler from '../util/catchAsync';
 
 import { iRequestWithToken } from '../interfaces/oauthInterfaces';
@@ -43,7 +43,7 @@ const temp_callback_middleware = (req: iRequestWithToken, res) => {
 
 router.get(
   '/google',
-  (req, res, next) => {
+  (req:Request, res, next) => {
     console.log('google auth hit');
     console.log('original url: ', req.originalUrl);
     next();

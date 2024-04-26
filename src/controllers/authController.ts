@@ -177,47 +177,7 @@ export const verifyResetToken = asyncHandler(
   }
 );
 
-interface iOAuthRequest extends Request {
-  user: {
-    _doc: {
-      _id: string;
-      email: string;
-      name: string;
-      profilePic: string;
-    };
-    email: string;
-    name: string;
-    profilePic: string;
-  };
-}
-export const sendOAuthVerifiedUser = asyncHandler(
-  async (req: iOAuthRequest, res: Response) => {
-    try {
-      const id = req.params.userId;
-      const user = await UserModel.findById({ _id: id });
-      if (!user) {
-        throw Error('User not found');
-      }
-      const token = createToken(user._id);
-
-      res.status(200).json({
-        message: 'Login successful!',
-        success: true,
-        token: token,
-        email: user.email,
-        id: user._id,
-        name: user.name,
-        pic: user.profilePic,
-      });
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json({
-        message: 'Login failed!',
-        success: false,
-      });
-    }
-  }
-);
+import { iOAuthRequest } from '../interfaces/oauthInterfaces';
 
 export const setGauthInCookie = asyncHandler(
   async (req: iOAuthRequest, res: Response) => {
