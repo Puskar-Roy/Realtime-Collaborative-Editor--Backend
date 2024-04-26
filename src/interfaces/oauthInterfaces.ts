@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { User } from './userInterface';
 export interface iRequestWithToken extends Request {
   user: {
     accessToken: string;
@@ -19,3 +20,9 @@ export interface iOAuthRequest extends Request {
     profilePic: string;
   };
 }
+
+export interface iAuthUser extends User{
+    accessToken?: string;
+    refreshToken?: string;
+  }
+  
