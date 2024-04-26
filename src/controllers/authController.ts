@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import asyncHandler from '../util/catchAsync';
 import UserModel from '../models/userSchema';
 import VerifyModel from '../models/verifySchema';
@@ -7,6 +7,7 @@ import validator from 'validator';
 import { createToken } from '../util/utils';
 import { sendEmailwithNodemailer } from '../util/sendEmail';
 import { sendOTPwithNodemailer } from '../util/sendOTP';
+import config from '../config/config';
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -170,6 +171,84 @@ export const verifyResetToken = asyncHandler(
       return res
         .status(400)
         .json({ success: false, message: 'Password reset failed' });
+    }
+  }
+);
+
+interface iOAuthRequest extends Request {
+  user: {
+    _doc: {
+      _id: string;
+      email: string;
+      name: string;
+      profilePic: string;
+    };
+    email: string;
+    name: string;
+    profilePic: string;
+  };
+}
+export const sendOAuthVerifiedUser = asyncHandler(
+  async (req: iOAuthRequest, res: Response) => {
+    try {
+      const id = req.params.userId;
+      const user = await UserModel.findById({ _id: id });
+      if (!user) {
+        throw Error('User not found');
+      }
+      const token = createToken(user._id);
+
+      res.status(200).json({
+        message: 'Login successful!',
+        success: true,
+        token: token,
+        email: user.email,
+        id: user._id,
+        name: user.name,
+        pic: user.profilePic,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        message: 'Login failed!',
+        success: false,
+      });
+    }
+  }
+);
+
+export const setGauthInCookie = asyncHandler(
+  async (req: iOAuthRequest, res: Response) => {
+    const user = req.user._doc;
+    try {
+      if (!user) {
+        throw Error('User not found');
+      }
+      const token = createToken(user._id);
+      const cookieOptions: CookieOptions = {
+        httpOnly: false,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 30),
+        secure: config.DEV_ENV === 'PROD' ? true : false,
+        sameSite: 'lax',
+      };
+      const cookieInfo = {
+        message: 'Login successful!',
+        success: true,
+        token: token,
+        email: user.email,
+        id: user._id.toString(),
+        name: user.name,
+        pic: user.profilePic,
+      };
+
+      res.cookie('oauthToken', JSON.stringify(cookieInfo), cookieOptions);
+      res.redirect(config.FRONTENDURL);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({
+        message: 'Login failed!',
+        success: false,
+      });
     }
   }
 );
