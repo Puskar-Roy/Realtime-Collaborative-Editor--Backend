@@ -9,20 +9,6 @@ import { iRequestWithToken } from '../interfaces/oauthInterfaces';
 
 const router = express.Router();
 
-const tempCheckOAuthUserRoute = asyncHandler(
-  async (req: Request, res: Response, next:NextFunction) => {
-    // @ts-ignore
-    const userParam = req.params.userId;
-    console.log('req.user in tempCheckOAuthUserRoute is ', userParam);
-    res.status(200).json({
-      message: 'tempCheckOAuthUserRoute hit',
-      success: true,
-    });
-    next();
-  }
-);
-router.get('/user/:userId',tempCheckOAuthUserRoute, sendOAuthVerifiedUser);
-
 router.get(
   '/google/callback',
   passport.authenticate('google', {
