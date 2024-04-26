@@ -6,14 +6,9 @@ import UserModel from '../../models/userSchema';
 
 import { User } from '../../interfaces/userInterface';
 import VerifyModel from '../../models/verifySchema';
-
+import { iAuthUser } from '../../interfaces/oauthInterfaces';
 
 var isInvalid = false;
-
-interface iAuthUser extends User{
-  accessToken?: string;
-  refreshToken?: string;
-}
 
 async function createToken(user: iAuthUser) {
   try {
@@ -69,12 +64,12 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, callback) => {
       console.log('\n \n In the GoogleStrategy callback function \n \n');
-      console.log("Tokens are: \n");
-      console.log('accessToken', accessToken, "\n refreshToken", refreshToken);
+      console.log('Tokens are: \n');
+      console.log('accessToken', accessToken, '\n refreshToken', refreshToken);
       try {
-        let user: iAuthUser = await UserModel.findOne({ email: profile.emails[0].value });
+        let user = await UserModel.findOne({ email: profile.emails[0].value });
         if (user) {
-          return callback(null, {...user, accessToken, refreshToken });
+          return callback(null, { ...user, accessToken, refreshToken });
         }
 
         user = await UserModel.create({
@@ -82,13 +77,14 @@ passport.use(
           email: profile.emails[0].value,
           password: profile.id,
           profilePic: profile.photos[0].value,
-        }) ;
+          isVerified: true,
+        });
 
-        await createToken(user);
+        await createToken(user as iAuthUser);
 
         console.log('user', user);
         if (isInvalid) return callback(null, null);
-        return callback(null, {...user, accessToken, refreshToken });
+        return callback(null, { ...user, accessToken, refreshToken });
       } catch (error) {
         callback(error, null);
       }
