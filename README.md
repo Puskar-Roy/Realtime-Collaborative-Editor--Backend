@@ -11,9 +11,9 @@ Here is a simple guide <https://developers.google.com/workspace/guides/create-cr
 
 Or, if you prefer a video tutorial  <https://youtu.be/OKMgyF5ezFs?si=BV25hSD1JhqSiL_3>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/OKMgyF5ezFs?si=BV25hSD1JhqSiL_3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
+```txt
 Remember to set the redirect URL to http://localhost:8080/auth/google/callback or the port you are running your server on.
+```
 
 ### Add Env
 
