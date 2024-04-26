@@ -5,13 +5,9 @@ import config from '../config/config';
 import {  sendOAuthVerifiedUser, setGauthInCookie } from '../controllers/authController';
 import asyncHandler from '../util/catchAsync';
 
+import { iRequestWithToken } from '../interfaces/oauthInterfaces';
+
 const router = express.Router();
-interface iRequestWithToken extends express.Request {
-  user: {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
 
 const tempCheckOAuthUserRoute = asyncHandler(
   async (req: Request, res: Response, next:NextFunction) => {
