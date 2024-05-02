@@ -8,7 +8,7 @@
 
 ```bash
 PORT=8080 
-MONGOURI=
+MONGOURI= <your mongo url>
 
 JWT_SECRET="itsyourjwtsecrentusesomethingbigtoprotectyourjwtauthentication"
 JWT_COOKIE_EXPIRES_IN="3d"
